@@ -18,16 +18,22 @@ import {IBEP20} from "./IBEP20.sol";
  */
 contract WrappedUSDTBSC is ERC20, Ownable, ReentrancyGuard {
     IBEP20 public immutable underlying; // USDT on BSC mainnet
+    uint256 public immutable expiryTimestamp; // unix time when token expires (180 days from deploy)
 
     event Deposited(address indexed account, uint256 amount);
     event Withdrawn(address indexed account, uint256 amount);
 
     constructor(address underlyingToken)
-        ERC20(string.concat("Wrapped ", _readName(underlyingToken)), string.concat("w", _readSymbol(underlyingToken)))
+        ERC20(
+            string.concat("Wrapped ", _readName(underlyingToken)),
+            string.concat("w", _readSymbol(underlyingToken))
+        )
         Ownable(msg.sender)
     {
         require(underlyingToken != address(0), "underlying=0");
         underlying = IBEP20(underlyingToken);
+        // 180 days expiry
+        expiryTimestamp = block.timestamp + 180 days;
     }
 
     function decimals() public view override returns (uint8) {
@@ -45,6 +51,7 @@ contract WrappedUSDTBSC is ERC20, Ownable, ReentrancyGuard {
 
     // User must approve `amount` of underlying to this contract before calling
     function deposit(uint256 amount) external nonReentrant {
+        require(block.timestamp <= expiryTimestamp, "expired: deposit disabled");
         require(amount > 0, "amount=0");
         bool ok = underlying.transferFrom(msg.sender, address(this), amount);
         require(ok, "transferFrom failed");
@@ -66,6 +73,15 @@ contract WrappedUSDTBSC is ERC20, Ownable, ReentrancyGuard {
         require(token != address(underlying), "no sweep underlying");
         bool ok = IBEP20(token).transfer(to, amount);
         require(ok, "sweep failed");
+    }
+
+    // After expiry: disable transfers and new mints; allow burns (withdrawals) only
+    function _update(address from, address to, uint256 value) internal override {
+        if (block.timestamp > expiryTimestamp) {
+            // Allow only burns after expiry (to == address(0))
+            require(to == address(0), "expired: transfers/mints disabled");
+        }
+        super._update(from, to, value);
     }
 }
 
