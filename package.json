@@ -1,0 +1,37 @@
+{
+  "name": "bep20-wrapper-usdt",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wrapped/Mirrored BEP-20 token for USDT (BSC) with deposit/withdraw",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "lint": "echo 'No linter configured'",
+    "deploy:bsc": "hardhat run scripts/deploy.ts --network bsc",
+    "deploy:testnet": "hardhat run scripts/deploy.ts --network bscTestnet",
+    "demo:fork": "hardhat run scripts/fork-demo.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.24",
+    "chai": "^4.3.10",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.11.1",
+    "hardhat": "^2.22.5",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  }
+}
+
