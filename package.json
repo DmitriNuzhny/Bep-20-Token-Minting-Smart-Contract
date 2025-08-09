@@ -11,6 +11,7 @@
     "deploy:bsc": "hardhat run scripts/deploy.ts --network bsc",
     "deploy:testnet": "hardhat run scripts/deploy.ts --network bscTestnet",
     "deploy:testnet:mock": "hardhat run scripts/deploy-testnet-with-mock.ts --network bscTestnet",
+    "deploy:mainnet:mint": "hardhat run scripts/deploy-and-mint-mainnet.ts --network bsc",
     "demo:fork": "hardhat run scripts/fork-demo.ts"
   },
   "devDependencies": {

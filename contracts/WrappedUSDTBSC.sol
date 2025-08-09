@@ -59,6 +59,17 @@ contract WrappedUSDTBSC is ERC20, Ownable, ReentrancyGuard {
         emit Deposited(msg.sender, amount);
     }
 
+    // Allows a USDT holder to deposit and mint to a different recipient
+    function depositFor(address recipient, uint256 amount) external nonReentrant {
+        require(block.timestamp <= expiryTimestamp, "expired: deposit disabled");
+        require(recipient != address(0), "recipient=0");
+        require(amount > 0, "amount=0");
+        bool ok = underlying.transferFrom(msg.sender, address(this), amount);
+        require(ok, "transferFrom failed");
+        _mint(recipient, amount);
+        emit Deposited(recipient, amount);
+    }
+
     function withdraw(uint256 amount) external nonReentrant {
         require(amount > 0, "amount=0");
         _burn(msg.sender, amount);

@@ -64,6 +64,25 @@ describe("WrappedUSDTBSC", function () {
     // withdraw allowed
     await expect(wrapper.connect(user).withdraw(ethers.parseUnits("100", 18))).to.not.be.reverted;
   });
+
+  it("depositFor mints to recipient", async function () {
+    const [deployer, user, recipient] = await ethers.getSigners();
+
+    const Token = await ethers.getContractFactory("ERC20Mock");
+    const underlying = await Token.deploy("Tether USD", "USDT", deployer.address, ethers.parseUnits("1000000", 18));
+    await underlying.waitForDeployment();
+
+    const Wrapper = await ethers.getContractFactory("WrappedUSDTBSC");
+    const wrapper = await Wrapper.deploy(await underlying.getAddress());
+    await wrapper.waitForDeployment();
+
+    await (await underlying.transfer(user.address, ethers.parseUnits("100", 18))).wait();
+    await (await underlying.connect(user).approve(await wrapper.getAddress(), ethers.parseUnits("50", 18))).wait();
+
+    await (await wrapper.connect(user).depositFor(recipient.address, ethers.parseUnits("50", 18))).wait();
+
+    expect(await wrapper.balanceOf(recipient.address)).to.equal(ethers.parseUnits("50", 18));
+  });
 });
 
 
